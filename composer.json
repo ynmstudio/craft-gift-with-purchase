@@ -1,7 +1,7 @@
 {
     "name": "ynmstudio/craft-gift-with-purchase",
     "description": "Automatically add gift products to carts when configurable conditions are met",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "type": "craft-plugin",
     "license": "proprietary",
     "keywords": [
@@ -28,9 +28,9 @@
         "docs": "https://github.com/ynmstudio/craft-gift-with-purchase/blob/main/README.md"
     },
     "require": {
-        "craftcms/cms": "^3.7",
-        "craftcms/commerce": "^3.4",
-        "php": "^8.1"
+        "craftcms/cms": "^5.0",
+        "craftcms/commerce": "^5.0",
+        "php": "^8.2"
     },
     "autoload": {
         "psr-4": {

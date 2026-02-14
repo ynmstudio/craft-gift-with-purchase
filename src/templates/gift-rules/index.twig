@@ -35,10 +35,10 @@
 
     {% set conditions = [] %}
     {% if rule.minSubtotal %}
-        {% set conditions = conditions|merge(['Min: ' ~ rule.minSubtotal|currency('EUR')]) %}
+        {% set conditions = conditions|merge(['Min: ' ~ rule.minSubtotal|currency]) %}
     {% endif %}
     {% if rule.maxSubtotal %}
-        {% set conditions = conditions|merge(['Max: ' ~ rule.maxSubtotal|currency('EUR')]) %}
+        {% set conditions = conditions|merge(['Max: ' ~ rule.maxSubtotal|currency]) %}
     {% endif %}
     {% if not rule.allPurchasables %}
         {% set conditions = conditions|merge(['Specific products']) %}
@@ -52,7 +52,7 @@
         title: rule.note ?: rule.name,
         url: url('gift-with-purchase/rules/' ~ rule.id),
         status: rule.enabled ? true : false,
-        giftPrice: rule.giftPrice|currency('EUR'),
+        giftPrice: rule.giftPrice|currency,
         conditions: conditions|join(', ') ?: '—',
         duration: dateRange,
         autoAdd: rule.autoAdd ? true : false,

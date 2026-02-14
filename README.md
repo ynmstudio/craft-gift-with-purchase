@@ -6,9 +6,11 @@ Automatically add gift products to shopping carts when configurable conditions a
 
 ## Requirements
 
-- Craft CMS 3.7+
-- Craft Commerce 3.4+
-- PHP 8.1+
+- Craft CMS 5.0+
+- Craft Commerce 5.0+
+- PHP 8.2+
+
+> **Note:** For Craft 3 / Commerce 3 support, use version `1.x`.
 
 ## Installation
 

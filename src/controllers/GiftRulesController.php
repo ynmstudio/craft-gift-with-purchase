@@ -32,7 +32,7 @@ class GiftRulesController extends Controller
      */
     public function actionIndex(): Response
     {
-        $giftRules = GiftWithPurchase::$plugin->getGiftRules()->getAllGiftRules();
+        $giftRules = GiftWithPurchase::getInstance()->getGiftRules()->getAllGiftRules();
         return $this->renderTemplate('gift-with-purchase/gift-rules/index', compact('giftRules'));
     }
 
@@ -46,7 +46,7 @@ class GiftRulesController extends Controller
 
         if (!$variables['giftRule']) {
             if ($variables['ruleId']) {
-                $variables['giftRule'] = GiftWithPurchase::$plugin->getGiftRules()->getGiftRuleById($variables['ruleId']);
+                $variables['giftRule'] = GiftWithPurchase::getInstance()->getGiftRules()->getGiftRuleById($variables['ruleId']);
                 if (!$variables['giftRule']) {
                     throw new HttpException(404);
                 }
@@ -137,7 +137,7 @@ class GiftRulesController extends Controller
         $giftRule->setUserGroupIds($groups);
 
         // Save
-        if (GiftWithPurchase::$plugin->getGiftRules()->saveGiftRule($giftRule)) {
+        if (GiftWithPurchase::getInstance()->getGiftRules()->saveGiftRule($giftRule)) {
             $this->setSuccessFlash(Craft::t('gift-with-purchase', 'Gift rule saved.'));
             return $this->redirectToPostedUrl($giftRule);
         }
@@ -171,7 +171,7 @@ class GiftRulesController extends Controller
         }
 
         foreach ($ids as $id) {
-            GiftWithPurchase::$plugin->getGiftRules()->deleteGiftRuleById($id);
+            GiftWithPurchase::getInstance()->getGiftRules()->deleteGiftRuleById($id);
         }
 
         if ($this->request->getAcceptsJson()) {
@@ -192,7 +192,7 @@ class GiftRulesController extends Controller
 
         $ids = Json::decode(Craft::$app->getRequest()->getRequiredBodyParam('ids'));
 
-        if (GiftWithPurchase::$plugin->getGiftRules()->reorderGiftRules($ids)) {
+        if (GiftWithPurchase::getInstance()->getGiftRules()->reorderGiftRules($ids)) {
             return $this->asJson(['success' => true]);
         }
 
@@ -214,7 +214,7 @@ class GiftRulesController extends Controller
             return;
         }
 
-        GiftWithPurchase::$plugin->getGiftRules()->updateStatusByIds($ids, $status === 'enabled');
+        GiftWithPurchase::getInstance()->getGiftRules()->updateStatusByIds($ids, $status === 'enabled');
 
         $this->setSuccessFlash(Craft::t('gift-with-purchase', 'Gift rules updated.'));
     }

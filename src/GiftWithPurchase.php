@@ -23,24 +23,18 @@ use ynmstudio\giftwithpurchase\services\GiftCart;
 class GiftWithPurchase extends Plugin
 {
     /**
-     * @var GiftWithPurchase
+     * @var bool
      */
-    public static $plugin;
+    public bool $hasCpSection = true;
 
     /**
      * @var bool
      */
-    public $hasCpSection = true;
+    public bool $hasCpSettings = true;
 
-    /**
-     * @var bool
-     */
-    public $hasCpSettings = true;
-
-    public function init()
+    public function init(): void
     {
         parent::init();
-        self::$plugin = $this;
 
         $this->setComponents([
             'giftRules' => GiftRules::class,

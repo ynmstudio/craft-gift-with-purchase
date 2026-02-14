@@ -70,10 +70,10 @@ class GiftCart extends Component
         $options = $lineItem->getOptions();
 
         if (!empty($options['__giftWithPurchase']) && !empty($options['__giftRuleId'])) {
-            $rule = GiftWithPurchase::$plugin->getGiftRules()->getGiftRuleById((int)$options['__giftRuleId']);
+            $rule = GiftWithPurchase::getInstance()->getGiftRules()->getGiftRuleById((int)$options['__giftRuleId']);
             if ($rule) {
                 $lineItem->price = (float)$rule->giftPrice;
-                $lineItem->salePrice = (float)$rule->giftPrice;
+                $lineItem->promotionalPrice = (float)$rule->giftPrice;
             }
         }
     }
@@ -105,7 +105,7 @@ class GiftCart extends Component
         $this->_isApplyingGifts = true;
 
         try {
-            $rules = GiftWithPurchase::$plugin->getGiftRules()->getAllEnabledGiftRules();
+            $rules = GiftWithPurchase::getInstance()->getGiftRules()->getAllEnabledGiftRules();
             $lineItems = $order->getLineItems();
             $orderChanged = false;
 
@@ -266,17 +266,16 @@ class GiftCart extends Component
         ];
 
         $lineItem = $lineItemService->createLineItem(
-            $order->id,
+            $order,
             $rule->giftPurchasableId,
             $options,
             $rule->giftQty,
-            $rule->note ?? '',
-            $order
+            $rule->note ?? ''
         );
 
         // Set initial price (will be maintained by EVENT_POPULATE_LINE_ITEM handler)
         $lineItem->price = (float)$rule->giftPrice;
-        $lineItem->salePrice = (float)$rule->giftPrice;
+        $lineItem->promotionalPrice = (float)$rule->giftPrice;
 
         $order->addLineItem($lineItem);
     }
@@ -322,8 +321,8 @@ class GiftCart extends Component
 
             // Get the product element (parent of variant)
             $element = $purchasable;
-            if (method_exists($purchasable, 'getProduct')) {
-                $element = $purchasable->getProduct();
+            if (method_exists($purchasable, 'getOwner')) {
+                $element = $purchasable->getOwner();
             }
 
             if (!$element) {

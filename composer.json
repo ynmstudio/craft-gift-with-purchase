@@ -1,0 +1,49 @@
+{
+    "name": "ynmstudio/craft-gift-with-purchase",
+    "description": "Automatically add gift products to carts when configurable conditions are met",
+    "version": "1.0.0",
+    "type": "craft-plugin",
+    "license": "proprietary",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "commerce",
+        "gift",
+        "promotion",
+        "free gift",
+        "gift with purchase"
+    ],
+    "authors": [
+        {
+            "name": "YNM Studio",
+            "homepage": "https://ynmstudio.com"
+        }
+    ],
+    "support": {
+        "email": "support@ynmstudio.com",
+        "issues": "https://github.com/ynmstudio/craft-gift-with-purchase/issues",
+        "source": "https://github.com/ynmstudio/craft-gift-with-purchase",
+        "docs": "https://github.com/ynmstudio/craft-gift-with-purchase/blob/main/README.md"
+    },
+    "require": {
+        "craftcms/cms": "^3.7",
+        "craftcms/commerce": "^3.4",
+        "php": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "ynmstudio\\giftwithpurchase\\": "src/"
+        }
+    },
+    "extra": {
+        "handle": "gift-with-purchase",
+        "name": "Gift with Purchase",
+        "developer": "YNM Studio",
+        "developerUrl": "https://ynmstudio.com",
+        "documentationUrl": "https://github.com/ynmstudio/craft-gift-with-purchase/blob/main/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/ynmstudio/craft-gift-with-purchase/main/CHANGELOG.md",
+        "class": "ynmstudio\\giftwithpurchase\\GiftWithPurchase"
+    }
+}

@@ -1,0 +1,264 @@
+{% extends "_layouts/cp" %}
+
+{% set selectedSubnavItem = 'rules' %}
+
+{% set crumbs = [
+    { label: 'Gift Rules'|t('gift-with-purchase'), url: url('gift-with-purchase/rules') },
+] %}
+
+{% set fullPageForm = true %}
+
+{% import "_includes/forms" as forms %}
+
+{% set detailsClasses = "" %}
+{% if (giftRule.getErrors('name') or giftRule.getErrors('giftPurchasableId')) %}
+    {% set detailsClasses = "error" %}
+{% endif %}
+
+{% set conditionsClasses = "" %}
+{% if (giftRule.getErrors('dateFrom') or giftRule.getErrors('dateTo')) %}
+    {% set conditionsClasses = "error" %}
+{% endif %}
+
+{% set tabs = {
+    0: {'label': 'Details'|t('gift-with-purchase'), 'url': '#gift-details', 'class': detailsClasses},
+    1: {'label': 'Behavior'|t('gift-with-purchase'), 'url': '#gift-behavior'},
+    2: {'label': 'Conditions'|t('gift-with-purchase'), 'url': '#gift-conditions', 'class': conditionsClasses},
+} %}
+
+{% block details %}
+    {% if giftRule and giftRule.id %}
+        <div class="meta read-only">
+            <div class="data">
+                <h5 class="heading">{{ "Created at"|t('app') }}</h5>
+                <div class="value">{{ giftRule.dateCreated|datetime('short') }}</div>
+            </div>
+            <div class="data">
+                <h5 class="heading">{{ "Updated at"|t('app') }}</h5>
+                <div class="value">{{ giftRule.dateUpdated|datetime('short') }}</div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block actionButton %}
+    <div class="btngroup">
+        <input type="submit" class="btn submit" value="{{ 'Save'|t('app') }}">
+        <button type="button" class="btn submit menubtn"></button>
+        <div class="menu">
+            <ul>
+                <li>
+                    <a class="formsubmit"
+                       data-redirect="{{ (isNewRule ? 'gift-with-purchase/rules/{id}' : giftRule.getCpEditUrl())|hash }}">
+                        {{ forms.optionShortcutLabel('S') }}
+                        {{ "Save and continue editing"|t('app') }}
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+        {{ actionInput('gift-with-purchase/gift-rules/save') }}
+        {{ redirectInput('gift-with-purchase/rules') }}
+        {% if giftRule.id %}
+            <input type="hidden" name="sortOrder" value="{{ giftRule.sortOrder }}">
+            <input type="hidden" name="id" value="{{ giftRule.id }}">
+        {% endif %}
+
+        {# ==================== DETAILS TAB ==================== #}
+        <div id="gift-details">
+            {{ forms.lightSwitchField({
+                label: 'Enable this gift rule'|t('gift-with-purchase'),
+                id: 'enabled',
+                name: 'enabled',
+                on: giftRule.enabled,
+                errors: giftRule.getErrors('enabled'),
+            }) }}
+
+            {{ forms.textField({
+                first: true,
+                label: 'Name'|t('gift-with-purchase'),
+                instructions: 'What this gift rule will be called in the control panel.'|t('gift-with-purchase'),
+                id: 'name',
+                name: 'name',
+                value: giftRule.name,
+                errors: giftRule.getErrors('name'),
+                autofocus: true,
+                required: true,
+            }) }}
+
+            {{ forms.textField({
+                label: 'Note'|t('gift-with-purchase'),
+                instructions: 'Optional note added to the gift line item in the cart.'|t('gift-with-purchase'),
+                id: 'note',
+                name: 'note',
+                value: giftRule.note,
+                errors: giftRule.getErrors('note'),
+            }) }}
+
+            {{ forms.elementSelectField({
+                label: 'Gift Product'|t('gift-with-purchase'),
+                instructions: 'The product variant to add as a gift.'|t('gift-with-purchase'),
+                id: 'giftPurchasableId',
+                name: 'giftPurchasableId',
+                elementType: 'craft\\commerce\\elements\\Variant',
+                elements: giftPurchasable ? [giftPurchasable] : [],
+                limit: 1,
+                required: true,
+                errors: giftRule.getErrors('giftPurchasableId'),
+            }) }}
+
+            {{ forms.textField({
+                label: 'Gift Quantity'|t('gift-with-purchase'),
+                instructions: 'How many of the gift item to add.'|t('gift-with-purchase'),
+                id: 'giftQty',
+                name: 'giftQty',
+                value: giftRule.giftQty,
+                type: 'number',
+                min: 1,
+                size: 5,
+                errors: giftRule.getErrors('giftQty'),
+            }) }}
+
+            {{ forms.textField({
+                label: 'Gift Price'|t('gift-with-purchase'),
+                instructions: 'Override price for the gift (0 = free).'|t('gift-with-purchase'),
+                id: 'giftPrice',
+                name: 'giftPrice',
+                value: giftRule.giftPrice,
+                type: 'number',
+                step: '0.01',
+                min: 0,
+                size: 10,
+                errors: giftRule.getErrors('giftPrice'),
+            }) }}
+        </div>
+
+        {# ==================== BEHAVIOR TAB ==================== #}
+        <div id="gift-behavior" class="hidden">
+            {{ forms.lightSwitchField({
+                label: 'Auto-add'|t('gift-with-purchase'),
+                instructions: 'Automatically add the gift to the cart when conditions are met.'|t('gift-with-purchase'),
+                id: 'autoAdd',
+                name: 'autoAdd',
+                on: giftRule.autoAdd,
+                errors: giftRule.getErrors('autoAdd'),
+            }) }}
+
+            {{ forms.lightSwitchField({
+                label: 'Re-add on removal'|t('gift-with-purchase'),
+                instructions: 'Re-add the gift if the customer removes it.'|t('gift-with-purchase'),
+                id: 'reAddOnRemoval',
+                name: 'reAddOnRemoval',
+                on: giftRule.reAddOnRemoval,
+                errors: giftRule.getErrors('reAddOnRemoval'),
+            }) }}
+        </div>
+
+        {# ==================== CONDITIONS TAB ==================== #}
+        <div id="gift-conditions" class="hidden">
+            {{ forms.dateTimeField({
+                label: 'Start Date'|t('gift-with-purchase'),
+                id: 'dateFrom',
+                name: 'dateFrom',
+                value: giftRule.dateFrom,
+                errors: giftRule.getErrors('dateFrom'),
+            }) }}
+
+            {{ forms.dateTimeField({
+                label: 'End Date'|t('gift-with-purchase'),
+                id: 'dateTo',
+                name: 'dateTo',
+                value: giftRule.dateTo,
+                errors: giftRule.getErrors('dateTo'),
+            }) }}
+
+            {{ forms.textField({
+                label: 'Minimum Subtotal'|t('gift-with-purchase'),
+                instructions: 'Minimum cart subtotal required (excluding gift items).'|t('gift-with-purchase'),
+                id: 'minSubtotal',
+                name: 'minSubtotal',
+                value: giftRule.minSubtotal,
+                type: 'number',
+                step: '0.01',
+                min: 0,
+                size: 10,
+                errors: giftRule.getErrors('minSubtotal'),
+            }) }}
+
+            {{ forms.textField({
+                label: 'Maximum Subtotal'|t('gift-with-purchase'),
+                instructions: 'Maximum cart subtotal allowed (excluding gift items).'|t('gift-with-purchase'),
+                id: 'maxSubtotal',
+                name: 'maxSubtotal',
+                value: giftRule.maxSubtotal,
+                type: 'number',
+                step: '0.01',
+                min: 0,
+                size: 10,
+                errors: giftRule.getErrors('maxSubtotal'),
+            }) }}
+
+            <hr>
+
+            {{ forms.lightSwitchField({
+                label: 'All purchasables'|t('gift-with-purchase'),
+                id: 'allPurchasables',
+                name: 'allPurchasables',
+                reverseToggle: '#conditions-purchasables',
+                on: giftRule.allPurchasables ? true : false,
+                errors: giftRule.getErrors('allPurchasables'),
+            }) }}
+
+            <div id="conditions-purchasables" {% if giftRule.allPurchasables %}class="hidden"{% endif %}>
+                {% for purchasableType in purchasableTypes %}
+                    {{ forms.elementSelectField({
+                        id: 'purchasables-' ~ purchasableType.elementType|id,
+                        label: purchasableType.name,
+                        instructions: 'Required purchasables in cart.'|t('gift-with-purchase'),
+                        name: 'purchasables[' ~ purchasableType.elementType ~ ']',
+                        elements: purchasables[purchasableType.elementType] ?? null,
+                        elementType: purchasableType.elementType,
+                        limit: null,
+                        errors: giftRule.getErrors('purchasables'),
+                    }) }}
+                {% endfor %}
+            </div>
+
+            {{ forms.lightSwitchField({
+                label: 'All categories'|t('gift-with-purchase'),
+                id: 'allCategories',
+                name: 'allCategories',
+                reverseToggle: '#conditions-categories',
+                on: giftRule.allCategories ? true : false,
+                errors: giftRule.getErrors('allCategories'),
+            }) }}
+
+            <div id="conditions-categories" {% if giftRule.allCategories %}class="hidden"{% endif %}>
+                {{ forms.elementSelectField({
+                    id: 'categories',
+                    label: 'Categories'|t('commerce'),
+                    instructions: 'Required categories of products in cart.'|t('gift-with-purchase'),
+                    name: 'categories',
+                    elements: categories ? categories : null,
+                    elementType: categoryElementType,
+                    limit: null,
+                    errors: giftRule.getErrors('categories'),
+                }) }}
+            </div>
+
+            {% if groups|length %}
+                <hr>
+                {{ forms.checkboxSelectField({
+                    label: 'User Groups'|t('gift-with-purchase'),
+                    instructions: 'Limit this gift rule to customers in specific user groups.',
+                    id: 'groups',
+                    name: 'groups',
+                    options: groups,
+                    values: giftRule.getUserGroupIds(),
+                }) }}
+            {% endif %}
+        </div>
+{% endblock %}

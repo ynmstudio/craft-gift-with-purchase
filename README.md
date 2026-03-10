@@ -74,7 +74,7 @@ Gift line items are internally marked with metadata (`__giftWithPurchase`, `__gi
 
 ### Declared Value (Customs / Export)
 
-For international shipping, customs authorities require a declared value for every item — even gifts priced at 0. The optional **Declared Value** field stores a market value that is passed to the line item options as `__giftValue`.
+For international shipping, customs authorities require a declared value for every item — even gifts priced at 0. The optional **Declared Value** field stores a market value that is passed to the line item options as `__giftValue`. If left empty, the original product price is used automatically.
 
 To display the declared value in your Twig templates (invoices, PDFs, packing slips):
 

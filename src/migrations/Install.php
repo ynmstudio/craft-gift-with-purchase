@@ -36,6 +36,7 @@ class Install extends Migration
             'giftPurchasableId' => $this->integer()->notNull(),
             'giftQty' => $this->integer()->notNull()->defaultValue(1),
             'giftPrice' => $this->decimal(14, 4)->notNull()->defaultValue(0),
+            'giftValue' => $this->decimal(14, 4),
             'enabled' => $this->boolean()->notNull()->defaultValue(true),
             'dateFrom' => $this->dateTime(),
             'dateTo' => $this->dateTime(),

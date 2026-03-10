@@ -77,6 +77,8 @@ class GiftRulesController extends Controller
         $giftRule->enabled = (bool)$request->getBodyParam('enabled');
         $giftRule->giftQty = (int)($request->getBodyParam('giftQty') ?: 1);
         $giftRule->giftPrice = (float)($request->getBodyParam('giftPrice') ?: 0);
+        $giftValue = $request->getBodyParam('giftValue');
+        $giftRule->giftValue = ($giftValue !== null && $giftValue !== '') ? (float)$giftValue : null;
         $giftRule->autoAdd = (bool)$request->getBodyParam('autoAdd');
         $giftRule->reAddOnRemoval = (bool)$request->getBodyParam('reAddOnRemoval');
 

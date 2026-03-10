@@ -260,9 +260,17 @@ class GiftCart extends Component
     {
         $lineItemService = Commerce::getInstance()->getLineItems();
 
+        // Resolve declared value: use rule's giftValue, or fall back to purchasable's original price
+        $declaredValue = $rule->giftValue;
+        if ($declaredValue === null || $declaredValue === '') {
+            $purchasable = Commerce::getInstance()->getPurchasables()->getPurchasableById($rule->giftPurchasableId);
+            $declaredValue = $purchasable ? $purchasable->getPrice() : 0;
+        }
+
         $options = [
             '__giftWithPurchase' => true,
             '__giftRuleId' => $rule->id,
+            '__giftValue' => (float)$declaredValue,
         ];
 
         $lineItem = $lineItemService->createLineItem(

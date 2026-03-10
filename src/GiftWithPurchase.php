@@ -22,14 +22,10 @@ use ynmstudio\giftwithpurchase\services\GiftCart;
  */
 class GiftWithPurchase extends Plugin
 {
-    /**
-     * @var bool
-     */
+    public string $schemaVersion = '1.1.0';
+
     public bool $hasCpSection = true;
 
-    /**
-     * @var bool
-     */
     public bool $hasCpSettings = true;
 
     public function init(): void

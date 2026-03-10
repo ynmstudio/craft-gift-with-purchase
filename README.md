@@ -47,6 +47,7 @@ Or install from the [Craft Plugin Store](https://plugins.craftcms.com) by search
 | **Gift Product** | The purchasable variant to add as a gift. |
 | **Gift Quantity** | How many of the gift item to add (default: 1). |
 | **Gift Price** | Override price for the gift (default: 0 = free). |
+| **Declared Value** | Optional declared value for customs/export purposes (does not affect customer price). |
 
 ### Behavior
 
@@ -70,6 +71,28 @@ Or install from the [Craft Plugin Store](https://plugins.craftcms.com) by search
 When a cart is updated, the plugin evaluates all enabled gift rules. If a rule's conditions are met, the configured gift product is added as a line item with the specified price and optional note. If conditions are no longer met, the gift is automatically removed.
 
 Gift line items are internally marked with metadata (`__giftWithPurchase`, `__giftRuleId`) so they can be distinguished from regular purchases. The gift price is maintained through Commerce's price recalculation via the `EVENT_POPULATE_LINE_ITEM` event.
+
+### Declared Value (Customs / Export)
+
+For international shipping, customs authorities require a declared value for every item — even gifts priced at 0. The optional **Declared Value** field stores a market value that is passed to the line item options as `__giftValue`.
+
+To display the declared value in your Twig templates (invoices, PDFs, packing slips):
+
+```twig
+{% for lineItem in order.lineItems %}
+    {% set options = lineItem.options %}
+
+    {% if options.__giftWithPurchase is defined and options.__giftWithPurchase %}
+        {# This is a gift line item #}
+        {{ lineItem.description }} — Offered
+
+        {% if options.__giftValue is defined and options.__giftValue %}
+            {# Declared value for customs/export #}
+            Declared value: {{ options.__giftValue|currency }}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+```
 
 ## Events
 

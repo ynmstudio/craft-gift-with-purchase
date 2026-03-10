@@ -22,6 +22,8 @@ use ynmstudio\giftwithpurchase\services\GiftCart;
  */
 class GiftWithPurchase extends Plugin
 {
+    public $schemaVersion = '1.1.0';
+
     /**
      * @var GiftWithPurchase
      */

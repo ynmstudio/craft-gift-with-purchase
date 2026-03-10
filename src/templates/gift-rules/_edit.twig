@@ -134,6 +134,19 @@
                 size: 10,
                 errors: giftRule.getErrors('giftPrice'),
             }) }}
+
+            {{ forms.textField({
+                label: 'Declared Value'|t('gift-with-purchase'),
+                instructions: 'Optional declared value for customs/export purposes. This does not affect the price charged to the customer.'|t('gift-with-purchase'),
+                id: 'giftValue',
+                name: 'giftValue',
+                value: giftRule.giftValue,
+                type: 'number',
+                step: '0.01',
+                min: 0,
+                size: 10,
+                errors: giftRule.getErrors('giftValue'),
+            }) }}
         </div>
 
         {# ==================== BEHAVIOR TAB ==================== #}

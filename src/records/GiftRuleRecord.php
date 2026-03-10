@@ -12,6 +12,7 @@ use ynmstudio\giftwithpurchase\db\Table;
  * @property int $giftPurchasableId
  * @property int $giftQty
  * @property float $giftPrice
+ * @property float|null $giftValue
  * @property bool $enabled
  * @property \DateTime|null $dateFrom
  * @property \DateTime|null $dateTo

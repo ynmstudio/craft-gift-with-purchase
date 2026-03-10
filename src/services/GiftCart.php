@@ -263,6 +263,7 @@ class GiftCart extends Component
         $options = [
             '__giftWithPurchase' => true,
             '__giftRuleId' => $rule->id,
+            '__giftValue' => $rule->giftValue,
         ];
 
         $lineItem = $lineItemService->createLineItem(

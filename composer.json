@@ -1,7 +1,7 @@
 {
   "name": "ynmstudio/craft-gift-with-purchase",
   "description": "Automatically add gift products to carts when configurable conditions are met",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "type": "craft-plugin",
   "license": "proprietary",
   "keywords": [

@@ -6,7 +6,7 @@
 {% do view.registerAssetBundle('craft\\web\\assets\\admintable\\AdminTableAsset') %}
 {% do view.registerTranslations('gift-with-purchase', [
     'Name',
-    'Gift Price',
+    'Discount',
     'Duration',
     'Auto-add',
     'Enabled',
@@ -52,7 +52,7 @@
         title: rule.note ?: rule.name,
         url: url('gift-with-purchase/rules/' ~ rule.id),
         status: rule.enabled ? true : false,
-        giftPrice: rule.giftPrice|currency,
+        discount: rule.giftDiscountPercent ~ '%',
         conditions: conditions|join(', ') ?: '—',
         duration: dateRange,
         autoAdd: rule.autoAdd ? true : false,
@@ -89,7 +89,7 @@
 
     var columns = [
         { name: '__slot:title', title: Craft.t('gift-with-purchase', 'Name') },
-        { name: 'giftPrice', title: Craft.t('gift-with-purchase', 'Gift Price') },
+        { name: 'discount', title: Craft.t('gift-with-purchase', 'Discount') },
         { name: 'conditions', title: Craft.t('gift-with-purchase', 'Conditions') },
         { name: 'duration', title: Craft.t('gift-with-purchase', 'Duration') },
         { name: 'autoAdd', title: Craft.t('gift-with-purchase', 'Auto-add'),

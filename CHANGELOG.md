@@ -1,5 +1,20 @@
 # Release Notes for Gift with Purchase
 
+## 5.1.0 - 2026-03-12
+
+### Changed
+
+- Replaced "Gift Price" (absolute price override) with "Gift Discount %" (percentage discount, 100% = free by default).
+- Gift line items now show the original product price; the discount is applied as a Commerce order adjustment labeled "Offered".
+- Tax calculations now use Commerce's built-in discount logic instead of manual price overrides.
+- Registered custom `GiftDiscountAdjuster` via Commerce's `EVENT_REGISTER_ORDER_ADJUSTERS`.
+
+### Removed
+
+- Removed `giftPrice` field (replaced by `giftDiscountPercent`).
+- Removed `giftValue` (declared value) field — no longer needed since original prices are preserved.
+- Removed `EVENT_POPULATE_LINE_ITEM` price override handler.
+
 ## 5.0.0 - 2026-02-14
 
 ### Changed

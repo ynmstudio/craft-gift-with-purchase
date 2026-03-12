@@ -11,8 +11,7 @@ use ynmstudio\giftwithpurchase\db\Table;
  * @property string|null $note
  * @property int $giftPurchasableId
  * @property int $giftQty
- * @property float $giftPrice
- * @property float|null $giftValue
+ * @property float $giftDiscountPercent
  * @property bool $enabled
  * @property \DateTime|null $dateFrom
  * @property \DateTime|null $dateTo

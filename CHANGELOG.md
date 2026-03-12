@@ -1,5 +1,11 @@
 # Release Notes for Gift with Purchase
 
+## 5.1.1 - 2026-03-12
+
+### Fixed
+
+- Fixed gift discount calculation for customers with different tax rates (e.g. German 19% vs French 20%). The discount now accounts for tax adjustments so the line item total is correct regardless of whether prices include tax.
+
 ## 5.1.0 - 2026-03-12
 
 ### Changed

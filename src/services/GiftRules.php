@@ -107,8 +107,7 @@ class GiftRules extends Component
         $record->note = $model->note;
         $record->giftPurchasableId = $model->giftPurchasableId;
         $record->giftQty = $model->giftQty;
-        $record->giftPrice = $model->giftPrice;
-        $record->giftValue = $model->giftValue;
+        $record->giftDiscountPercent = $model->giftDiscountPercent;
         $record->enabled = $model->enabled;
         $record->dateFrom = $model->dateFrom;
         $record->dateTo = $model->dateTo;
@@ -251,8 +250,7 @@ class GiftRules extends Component
                 'note',
                 'giftPurchasableId',
                 'giftQty',
-                'giftPrice',
-                'giftValue',
+                'giftDiscountPercent',
                 'enabled',
                 'dateFrom',
                 'dateTo',

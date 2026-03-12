@@ -37,9 +37,11 @@ class GiftDiscountAdjuster implements AdjusterInterface
                 continue;
             }
 
-            // Use promotionalPrice if set, otherwise salePrice (Commerce 5 uses promotionalPrice)
-            $unitPrice = $lineItem->promotionalPrice ?? $lineItem->salePrice;
-            $discountAmount = -($unitPrice * $lineItem->qty * ($discountPercent / 100));
+            // Use the line item's current total (subtotal + non-included adjustments
+            // like tax swaps) so the discount is correct regardless of the customer's
+            // tax rate or whether prices include tax.
+            $currentTotal = $lineItem->getSubtotal() + $lineItem->getAdjustmentsTotal();
+            $discountAmount = -($currentTotal * ($discountPercent / 100));
 
             $adjustment = new OrderAdjustment();
             $adjustment->type = self::ADJUSTMENT_TYPE;

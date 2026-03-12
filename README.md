@@ -39,60 +39,38 @@ Or install from the [Craft Plugin Store](https://plugins.craftcms.com) by search
 
 ### Details
 
-| Field | Description |
-|---|---|
-| **Enabled** | Toggle the rule on or off. |
-| **Name** | Internal name for the rule. |
-| **Note** | Optional note added to the gift line item in the cart. |
-| **Gift Product** | The purchasable variant to add as a gift. |
-| **Gift Quantity** | How many of the gift item to add (default: 1). |
-| **Gift Price** | Override price for the gift (default: 0 = free). |
+| Field              | Description                                                                           |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| **Enabled**        | Toggle the rule on or off.                                                            |
+| **Name**           | Internal name for the rule.                                                           |
+| **Note**           | Optional note added to the gift line item in the cart.                                |
+| **Gift Product**   | The purchasable variant to add as a gift.                                             |
+| **Gift Quantity**  | How many of the gift item to add (default: 1).                                        |
+| **Gift Price**     | Override price for the gift (default: 0 = free).                                      |
 | **Declared Value** | Optional declared value for customs/export purposes (does not affect customer price). |
 
 ### Behavior
 
-| Field | Description |
-|---|---|
-| **Auto-add** | Automatically add the gift when conditions are met. |
+| Field                 | Description                                               |
+| --------------------- | --------------------------------------------------------- |
+| **Auto-add**          | Automatically add the gift when conditions are met.       |
 | **Re-add on removal** | Re-add the gift if the customer removes it from the cart. |
 
 ### Conditions
 
-| Field | Description |
-|---|---|
-| **Start / End Date** | Limit the rule to a specific date range. |
+| Field                  | Description                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| **Start / End Date**   | Limit the rule to a specific date range.                                       |
 | **Min / Max Subtotal** | Require a cart subtotal within a range (gift items excluded from calculation). |
-| **Purchasables** | Require specific products to be in the cart. |
-| **Categories** | Require products from specific categories to be in the cart. |
-| **User Groups** | Restrict the rule to specific user groups (Craft Pro). |
+| **Purchasables**       | Require specific products to be in the cart.                                   |
+| **Categories**         | Require products from specific categories to be in the cart.                   |
+| **User Groups**        | Restrict the rule to specific user groups (Craft Pro).                         |
 
 ## How It Works
 
 When a cart is updated, the plugin evaluates all enabled gift rules. If a rule's conditions are met, the configured gift product is added as a line item with the specified price and optional note. If conditions are no longer met, the gift is automatically removed.
 
 Gift line items are internally marked with metadata (`__giftWithPurchase`, `__giftRuleId`) so they can be distinguished from regular purchases. The gift price is maintained through Commerce's price recalculation via the `EVENT_POPULATE_LINE_ITEM` event.
-
-### Declared Value (Customs / Export)
-
-For international shipping, customs authorities require a declared value for every item — even gifts priced at 0. The optional **Declared Value** field stores a market value that is passed to the line item options as `__giftValue`. If left empty, the original product price is used automatically.
-
-To display the declared value in your Twig templates (invoices, PDFs, packing slips):
-
-```twig
-{% for lineItem in order.lineItems %}
-    {% set options = lineItem.options %}
-
-    {% if options.__giftWithPurchase is defined and options.__giftWithPurchase %}
-        {# This is a gift line item #}
-        {{ lineItem.description }} — Offered
-
-        {% if options.__giftValue is defined and options.__giftValue %}
-            {# Declared value for customs/export #}
-            Declared value: {{ options.__giftValue|currency }}
-        {% endif %}
-    {% endif %}
-{% endfor %}
-```
 
 ## Events
 

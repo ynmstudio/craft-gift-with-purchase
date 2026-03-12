@@ -4,6 +4,8 @@ namespace ynmstudio\giftwithpurchase;
 
 use Craft;
 use craft\base\Plugin;
+use craft\commerce\services\OrderAdjustments;
+use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\helpers\UrlHelper;
@@ -11,6 +13,7 @@ use craft\web\UrlManager;
 use craft\web\View;
 use yii\base\Event;
 
+use ynmstudio\giftwithpurchase\adjusters\GiftDiscountAdjuster;
 use ynmstudio\giftwithpurchase\services\GiftRules;
 use ynmstudio\giftwithpurchase\services\GiftCart;
 
@@ -22,7 +25,7 @@ use ynmstudio\giftwithpurchase\services\GiftCart;
  */
 class GiftWithPurchase extends Plugin
 {
-    public $schemaVersion = '1.1.0';
+    public $schemaVersion = '1.2.0';
 
     /**
      * @var GiftWithPurchase
@@ -52,6 +55,7 @@ class GiftWithPurchase extends Plugin
         $this->_registerCpRoutes();
         $this->_registerTemplateRoots();
         $this->_registerCartEventListeners();
+        $this->_registerOrderAdjusters();
 
         Craft::info('Gift with Purchase plugin initialized', __METHOD__);
     }
@@ -100,6 +104,17 @@ class GiftWithPurchase extends Plugin
     private function _registerCartEventListeners()
     {
         $this->getGiftCart()->registerEventListeners();
+    }
+
+    private function _registerOrderAdjusters()
+    {
+        Event::on(
+            OrderAdjustments::class,
+            OrderAdjustments::EVENT_REGISTER_ORDER_ADJUSTERS,
+            function (RegisterComponentTypesEvent $event) {
+                $event->types[] = GiftDiscountAdjuster::class;
+            }
+        );
     }
 
     /**

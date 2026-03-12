@@ -26,10 +26,7 @@ class GiftRule extends Model
     public $giftQty = 1;
 
     /** @var float */
-    public $giftPrice = 0;
-
-    /** @var float|null */
-    public $giftValue;
+    public $giftDiscountPercent = 100;
 
     /** @var bool */
     public $enabled = true;
@@ -163,7 +160,8 @@ class GiftRule extends Model
         return [
             [['name', 'giftPurchasableId'], 'required'],
             [['giftQty'], 'integer', 'min' => 1],
-            [['giftPrice', 'giftValue', 'minSubtotal', 'maxSubtotal'], 'number', 'skipOnEmpty' => true],
+            [['giftDiscountPercent'], 'number', 'min' => 0, 'max' => 100],
+            [['minSubtotal', 'maxSubtotal'], 'number', 'skipOnEmpty' => true],
             [['giftPurchasableId', 'sortOrder'], 'integer'],
             [['enabled', 'allCategories', 'allPurchasables', 'autoAdd', 'reAddOnRemoval'], 'boolean'],
         ];

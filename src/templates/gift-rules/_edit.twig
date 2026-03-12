@@ -123,29 +123,17 @@
             }) }}
 
             {{ forms.textField({
-                label: 'Gift Price'|t('gift-with-purchase'),
-                instructions: 'Override price for the gift (0 = free).'|t('gift-with-purchase'),
-                id: 'giftPrice',
-                name: 'giftPrice',
-                value: giftRule.giftPrice,
+                label: 'Gift Discount %'|t('gift-with-purchase'),
+                instructions: 'Percentage discount applied to the gift product (100 = free). The original price remains visible on the line item and a discount adjustment is applied.'|t('gift-with-purchase'),
+                id: 'giftDiscountPercent',
+                name: 'giftDiscountPercent',
+                value: giftRule.giftDiscountPercent,
                 type: 'number',
                 step: '0.01',
                 min: 0,
+                max: 100,
                 size: 10,
-                errors: giftRule.getErrors('giftPrice'),
-            }) }}
-
-            {{ forms.textField({
-                label: 'Declared Value'|t('gift-with-purchase'),
-                instructions: 'Optional declared value for customs/export purposes. If left empty, the original product price is used. This does not affect the price charged to the customer.'|t('gift-with-purchase'),
-                id: 'giftValue',
-                name: 'giftValue',
-                value: giftRule.giftValue,
-                type: 'number',
-                step: '0.01',
-                min: 0,
-                size: 10,
-                errors: giftRule.getErrors('giftValue'),
+                errors: giftRule.getErrors('giftDiscountPercent'),
             }) }}
         </div>
 

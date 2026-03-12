@@ -4,9 +4,7 @@ namespace ynmstudio\giftwithpurchase\services;
 
 use Craft;
 use craft\commerce\elements\Order;
-use craft\commerce\events\LineItemEvent;
 use craft\commerce\Plugin as Commerce;
-use craft\commerce\services\LineItems;
 use craft\elements\Category;
 use craft\db\Query;
 use yii\base\Component;
@@ -50,32 +48,6 @@ class GiftCart extends Component
                 $this->applyGiftRules($order);
             }
         );
-
-        // Ensure gift prices persist through Commerce recalculations
-        Event::on(
-            LineItems::class,
-            LineItems::EVENT_POPULATE_LINE_ITEM,
-            [$this, 'handlePopulateLineItem']
-        );
-    }
-
-    /**
-     * Ensure gift line item prices are maintained during Commerce price recalculation.
-     * Commerce refreshes prices from the purchasable on every recalculation —
-     * this event listener overrides them back to the gift price.
-     */
-    public function handlePopulateLineItem(LineItemEvent $event)
-    {
-        $lineItem = $event->lineItem;
-        $options = $lineItem->getOptions();
-
-        if (!empty($options['__giftWithPurchase']) && !empty($options['__giftRuleId'])) {
-            $rule = GiftWithPurchase::$plugin->getGiftRules()->getGiftRuleById((int)$options['__giftRuleId']);
-            if ($rule) {
-                $lineItem->price = (float)$rule->giftPrice;
-                $lineItem->salePrice = (float)$rule->giftPrice;
-            }
-        }
     }
 
     /**
@@ -255,22 +227,16 @@ class GiftCart extends Component
 
     /**
      * Add a gift line item to the order.
+     * The line item keeps its original purchasable price — the discount is
+     * applied by GiftDiscountAdjuster during order recalculation.
      */
     private function _addGiftLineItem(Order $order, GiftRule $rule)
     {
         $lineItemService = Commerce::getInstance()->getLineItems();
 
-        // Resolve declared value: use rule's giftValue, or fall back to purchasable's original price
-        $declaredValue = $rule->giftValue;
-        if ($declaredValue === null || $declaredValue === '') {
-            $purchasable = Commerce::getInstance()->getPurchasables()->getPurchasableById($rule->giftPurchasableId);
-            $declaredValue = $purchasable ? $purchasable->getPrice() : 0;
-        }
-
         $options = [
             '__giftWithPurchase' => true,
             '__giftRuleId' => $rule->id,
-            '__giftValue' => (float)$declaredValue,
         ];
 
         $lineItem = $lineItemService->createLineItem(
@@ -281,10 +247,6 @@ class GiftCart extends Component
             $rule->note ?? '',
             $order
         );
-
-        // Set initial price (will be maintained by EVENT_POPULATE_LINE_ITEM handler)
-        $lineItem->price = (float)$rule->giftPrice;
-        $lineItem->salePrice = (float)$rule->giftPrice;
 
         $order->addLineItem($lineItem);
     }

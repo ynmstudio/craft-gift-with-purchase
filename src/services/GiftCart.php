@@ -189,6 +189,12 @@ class GiftCart extends Component
                     // Add gift line item
                     $this->_addGiftLineItem($order, $rule);
                     $orderChanged = true;
+                } elseif ($conditionsMet && $giftLineItem) {
+                    // Conditions met, gift already in cart — enforce qty
+                    if ((int)$giftLineItem->qty !== (int)$rule->giftQty) {
+                        $giftLineItem->qty = $rule->giftQty;
+                        $orderChanged = true;
+                    }
                 } elseif (!$conditionsMet && $giftLineItem) {
                     // Conditions not met, but gift is in cart — remove it
                     $order->removeLineItem($giftLineItem);

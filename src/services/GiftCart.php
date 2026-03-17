@@ -4,7 +4,9 @@ namespace ynmstudio\giftwithpurchase\services;
 
 use Craft;
 use craft\commerce\elements\Order;
+use craft\commerce\events\PurchasableAvailableEvent;
 use craft\commerce\Plugin as Commerce;
+use craft\commerce\services\Purchasables;
 use craft\elements\Category;
 use craft\db\Query;
 use yii\base\Component;
@@ -17,6 +19,9 @@ class GiftCart extends Component
 {
     /** @var bool Recursion guard */
     private $_isApplyingGifts = false;
+
+    /** @var int[]|null Cached list of purchasable IDs with availability override */
+    private $_overriddenPurchasableIds;
 
     /**
      * Register all event listeners for cart integration.
@@ -48,6 +53,58 @@ class GiftCart extends Component
                 $this->applyGiftRules($order);
             }
         );
+
+        // Override purchasable availability for gift products when enabled on the rule
+        Event::on(
+            Purchasables::class,
+            Purchasables::EVENT_PURCHASABLE_AVAILABLE,
+            [$this, 'handlePurchasableAvailable']
+        );
+    }
+
+    /**
+     * Allow gift purchasables to be added to cart even when "Available for purchase" is off,
+     * if the corresponding gift rule has overridePurchasableAvailability enabled.
+     */
+    public function handlePurchasableAvailable(PurchasableAvailableEvent $event)
+    {
+        // Only act when Commerce considers the purchasable unavailable
+        if ($event->isAvailable) {
+            return;
+        }
+
+        $purchasableId = $event->purchasable->getId();
+        $overriddenIds = $this->_getOverriddenPurchasableIds();
+
+        if (in_array($purchasableId, $overriddenIds)) {
+            $event->isAvailable = true;
+        }
+    }
+
+    /**
+     * Get purchasable IDs that have overridePurchasableAvailability enabled
+     * on at least one active gift rule.
+     *
+     * @return int[]
+     */
+    private function _getOverriddenPurchasableIds(): array
+    {
+        if ($this->_overriddenPurchasableIds !== null) {
+            return $this->_overriddenPurchasableIds;
+        }
+
+        $this->_overriddenPurchasableIds = [];
+
+        $rules = GiftWithPurchase::$plugin->getGiftRules()->getAllEnabledGiftRules();
+        foreach ($rules as $rule) {
+            if ($rule->overridePurchasableAvailability && $rule->giftPurchasableId) {
+                $this->_overriddenPurchasableIds[] = (int)$rule->giftPurchasableId;
+            }
+        }
+
+        $this->_overriddenPurchasableIds = array_unique($this->_overriddenPurchasableIds);
+
+        return $this->_overriddenPurchasableIds;
     }
 
     /**

@@ -44,6 +44,8 @@ return [
     'Required purchasables in cart.' => 'Required purchasables in cart.',
     'Required categories of products in cart.' => 'Required categories of products in cart.',
     'User Groups' => 'User Groups',
+    'Override purchasable availability' => 'Override purchasable availability',
+    'Allow this gift to be added to the cart even when its product has "Available for purchase" disabled. Use this when the gift product should only be obtainable as a gift and not sold separately.' => 'Allow this gift to be added to the cart even when its product has "Available for purchase" disabled. Use this when the gift product should only be obtainable as a gift and not sold separately.',
     'Created at' => 'Created at',
     'Updated at' => 'Updated at',
 ];

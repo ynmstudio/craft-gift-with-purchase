@@ -82,6 +82,14 @@ class GiftCart extends Component
             return;
         }
 
+        // Never override availability when the purchasable has no stock.
+        // The override is meant to bypass "disabled / not available for purchase"
+        // flags, not to sell items that are physically out of stock.
+        $purchasable = $event->purchasable;
+        if (method_exists($purchasable, 'hasStock') && !$purchasable->hasStock()) {
+            return;
+        }
+
         // Allow during plugin-initiated add
         if ($this->_isAddingGift) {
             $event->isAvailable = true;

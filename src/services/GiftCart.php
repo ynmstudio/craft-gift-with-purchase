@@ -71,18 +71,44 @@ class GiftCart extends Component
      */
     public function handlePurchasableAvailable(PurchasableAvailableEvent $event)
     {
-        // Only override availability while the plugin itself is adding a gift line item.
-        // This prevents customers from adding "gift-only" products to their cart directly.
-        if (!$this->_isAddingGift || $event->isAvailable) {
+        if ($event->isAvailable) {
             return;
         }
 
         $purchasableId = $event->purchasable->getId();
         $overriddenIds = $this->_getOverriddenPurchasableIds();
 
-        if (in_array($purchasableId, $overriddenIds)) {
+        if (!in_array($purchasableId, $overriddenIds)) {
+            return;
+        }
+
+        // Allow during plugin-initiated add
+        if ($this->_isAddingGift) {
+            $event->isAvailable = true;
+            return;
+        }
+
+        // Allow during order recalculation when the order already contains
+        // this purchasable as a gift line item (otherwise Commerce removes it
+        // on refresh because it considers it unavailable).
+        $order = $event->order ?? null;
+        if ($order && $this->_orderHasGiftLineItemForPurchasable($order, $purchasableId)) {
             $event->isAvailable = true;
         }
+    }
+
+    /**
+     * Check if an order already contains a gift line item for a given purchasable.
+     */
+    private function _orderHasGiftLineItemForPurchasable(Order $order, int $purchasableId): bool
+    {
+        foreach ($order->getLineItems() as $lineItem) {
+            $options = $lineItem->getOptions();
+            if (!empty($options['__giftWithPurchase']) && (int)$lineItem->purchasableId === $purchasableId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -163,10 +189,32 @@ class GiftCart extends Component
                     // Add gift line item
                     $this->_addGiftLineItem($order, $rule);
                     $orderChanged = true;
+                } elseif ($conditionsMet && $giftLineItem) {
+                    // Conditions met, gift already in cart — enforce qty
+                    if ((int)$giftLineItem->qty !== (int)$rule->giftQty) {
+                        $giftLineItem->qty = $rule->giftQty;
+                        $orderChanged = true;
+                    }
                 } elseif (!$conditionsMet && $giftLineItem) {
                     // Conditions not met, but gift is in cart — remove it
                     $order->removeLineItem($giftLineItem);
                     $orderChanged = true;
+                }
+            }
+
+            // Remove any non-gift line items for purchasables that should
+            // only be obtainable as gifts. The order-based availability
+            // override necessarily allows the purchasable through during
+            // recalculation, so a customer could slip in a regular line item
+            // for the same variant. This strips those out.
+            $overriddenIds = $this->_getOverriddenPurchasableIds();
+            if (!empty($overriddenIds)) {
+                foreach ($order->getLineItems() as $lineItem) {
+                    $options = $lineItem->getOptions();
+                    if (empty($options['__giftWithPurchase']) && in_array((int)$lineItem->purchasableId, $overriddenIds)) {
+                        $order->removeLineItem($lineItem);
+                        $orderChanged = true;
+                    }
                 }
             }
 

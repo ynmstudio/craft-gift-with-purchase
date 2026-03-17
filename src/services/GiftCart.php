@@ -202,6 +202,22 @@ class GiftCart extends Component
                 }
             }
 
+            // Remove any non-gift line items for purchasables that should
+            // only be obtainable as gifts. The order-based availability
+            // override necessarily allows the purchasable through during
+            // recalculation, so a customer could slip in a regular line item
+            // for the same variant. This strips those out.
+            $overriddenIds = $this->_getOverriddenPurchasableIds();
+            if (!empty($overriddenIds)) {
+                foreach ($order->getLineItems() as $lineItem) {
+                    $options = $lineItem->getOptions();
+                    if (empty($options['__giftWithPurchase']) && in_array((int)$lineItem->purchasableId, $overriddenIds)) {
+                        $order->removeLineItem($lineItem);
+                        $orderChanged = true;
+                    }
+                }
+            }
+
             if ($orderChanged) {
                 // Re-save the order to persist changes
                 Craft::$app->getElements()->saveElement($order, false);

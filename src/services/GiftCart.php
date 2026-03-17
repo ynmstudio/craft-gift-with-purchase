@@ -20,6 +20,9 @@ class GiftCart extends Component
     /** @var bool Recursion guard */
     private $_isApplyingGifts = false;
 
+    /** @var bool True only while _addGiftLineItem is executing */
+    private $_isAddingGift = false;
+
     /** @var int[]|null Cached list of purchasable IDs with availability override */
     private $_overriddenPurchasableIds;
 
@@ -68,8 +71,9 @@ class GiftCart extends Component
      */
     public function handlePurchasableAvailable(PurchasableAvailableEvent $event)
     {
-        // Only act when Commerce considers the purchasable unavailable
-        if ($event->isAvailable) {
+        // Only override availability while the plugin itself is adding a gift line item.
+        // This prevents customers from adding "gift-only" products to their cart directly.
+        if (!$this->_isAddingGift || $event->isAvailable) {
             return;
         }
 
@@ -296,16 +300,23 @@ class GiftCart extends Component
             '__giftRuleId' => $rule->id,
         ];
 
-        $lineItem = $lineItemService->createLineItem(
-            $order->id,
-            $rule->giftPurchasableId,
-            $options,
-            $rule->giftQty,
-            $rule->note ?? '',
-            $order
-        );
+        // Set flag so the EVENT_PURCHASABLE_AVAILABLE handler knows this is
+        // a plugin-initiated add, not a customer adding the item directly.
+        $this->_isAddingGift = true;
+        try {
+            $lineItem = $lineItemService->createLineItem(
+                $order->id,
+                $rule->giftPurchasableId,
+                $options,
+                $rule->giftQty,
+                $rule->note ?? '',
+                $order
+            );
 
-        $order->addLineItem($lineItem);
+            $order->addLineItem($lineItem);
+        } finally {
+            $this->_isAddingGift = false;
+        }
     }
 
     /**

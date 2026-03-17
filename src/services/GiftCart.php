@@ -71,18 +71,44 @@ class GiftCart extends Component
      */
     public function handlePurchasableAvailable(PurchasableAvailableEvent $event)
     {
-        // Only override availability while the plugin itself is adding a gift line item.
-        // This prevents customers from adding "gift-only" products to their cart directly.
-        if (!$this->_isAddingGift || $event->isAvailable) {
+        if ($event->isAvailable) {
             return;
         }
 
         $purchasableId = $event->purchasable->getId();
         $overriddenIds = $this->_getOverriddenPurchasableIds();
 
-        if (in_array($purchasableId, $overriddenIds)) {
+        if (!in_array($purchasableId, $overriddenIds)) {
+            return;
+        }
+
+        // Allow during plugin-initiated add
+        if ($this->_isAddingGift) {
+            $event->isAvailable = true;
+            return;
+        }
+
+        // Allow during order recalculation when the order already contains
+        // this purchasable as a gift line item (otherwise Commerce removes it
+        // on refresh because it considers it unavailable).
+        $order = $event->order ?? null;
+        if ($order && $this->_orderHasGiftLineItemForPurchasable($order, $purchasableId)) {
             $event->isAvailable = true;
         }
+    }
+
+    /**
+     * Check if an order already contains a gift line item for a given purchasable.
+     */
+    private function _orderHasGiftLineItemForPurchasable(Order $order, int $purchasableId): bool
+    {
+        foreach ($order->getLineItems() as $lineItem) {
+            $options = $lineItem->getOptions();
+            if (!empty($options['__giftWithPurchase']) && (int)$lineItem->purchasableId === $purchasableId) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

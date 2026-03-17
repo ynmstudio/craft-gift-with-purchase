@@ -79,6 +79,7 @@ class GiftRulesController extends Controller
         $giftRule->giftDiscountPercent = (float)($request->getBodyParam('giftDiscountPercent') ?? 100);
         $giftRule->autoAdd = (bool)$request->getBodyParam('autoAdd');
         $giftRule->reAddOnRemoval = (bool)$request->getBodyParam('reAddOnRemoval');
+        $giftRule->overridePurchasableAvailability = (bool)$request->getBodyParam('overridePurchasableAvailability');
 
         // Gift purchasable (element select returns array)
         $giftPurchasableIds = $request->getBodyParam('giftPurchasableId');

@@ -156,6 +156,17 @@
                 on: giftRule.reAddOnRemoval,
                 errors: giftRule.getErrors('reAddOnRemoval'),
             }) }}
+
+            <hr>
+
+            {{ forms.lightSwitchField({
+                label: 'Override purchasable availability'|t('gift-with-purchase'),
+                instructions: 'Allow this gift to be added to the cart even when its product has "Available for purchase" disabled. Use this when the gift product should only be obtainable as a gift and not sold separately.'|t('gift-with-purchase'),
+                id: 'overridePurchasableAvailability',
+                name: 'overridePurchasableAvailability',
+                on: giftRule.overridePurchasableAvailability,
+                errors: giftRule.getErrors('overridePurchasableAvailability'),
+            }) }}
         </div>
 
         {# ==================== CONDITIONS TAB ==================== #}

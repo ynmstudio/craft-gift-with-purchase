@@ -45,6 +45,7 @@ class Install extends Migration
             'allPurchasables' => $this->boolean()->notNull()->defaultValue(true),
             'autoAdd' => $this->boolean()->notNull()->defaultValue(true),
             'reAddOnRemoval' => $this->boolean()->notNull()->defaultValue(false),
+            'overridePurchasableAvailability' => $this->boolean()->notNull()->defaultValue(false),
             'sortOrder' => $this->integer()->notNull()->defaultValue(999),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),

@@ -21,6 +21,7 @@ use ynmstudio\giftwithpurchase\db\Table;
  * @property bool $allPurchasables
  * @property bool $autoAdd
  * @property bool $reAddOnRemoval
+ * @property bool $overridePurchasableAvailability
  * @property int $sortOrder
  */
 class GiftRuleRecord extends ActiveRecord

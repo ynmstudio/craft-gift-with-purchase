@@ -55,6 +55,9 @@ class GiftRule extends Model
     /** @var bool */
     public $reAddOnRemoval = false;
 
+    /** @var bool */
+    public $overridePurchasableAvailability = false;
+
     /** @var int */
     public $sortOrder = 999;
 
@@ -163,7 +166,7 @@ class GiftRule extends Model
             [['giftDiscountPercent'], 'number', 'min' => 0, 'max' => 100],
             [['minSubtotal', 'maxSubtotal'], 'number', 'skipOnEmpty' => true],
             [['giftPurchasableId', 'sortOrder'], 'integer'],
-            [['enabled', 'allCategories', 'allPurchasables', 'autoAdd', 'reAddOnRemoval'], 'boolean'],
+            [['enabled', 'allCategories', 'allPurchasables', 'autoAdd', 'reAddOnRemoval', 'overridePurchasableAvailability'], 'boolean'],
         ];
     }
 

@@ -115,6 +115,7 @@ class GiftRules extends Component
         $record->maxSubtotal = $model->maxSubtotal;
         $record->autoAdd = $model->autoAdd;
         $record->reAddOnRemoval = $model->reAddOnRemoval;
+        $record->overridePurchasableAvailability = $model->overridePurchasableAvailability;
         $record->sortOrder = $record->sortOrder ?: 999;
 
         if ($record->allCategories = $model->allCategories) {
@@ -260,6 +261,7 @@ class GiftRules extends Component
                 'allPurchasables',
                 'autoAdd',
                 'reAddOnRemoval',
+                'overridePurchasableAvailability',
                 'sortOrder',
                 'dateCreated',
                 'dateUpdated',

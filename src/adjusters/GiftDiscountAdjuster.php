@@ -37,11 +37,43 @@ class GiftDiscountAdjuster implements AdjusterInterface
                 continue;
             }
 
-            // Use the line item's current total (subtotal + non-included adjustments
-            // like tax swaps) so the discount is correct regardless of the customer's
-            // tax rate or whether prices include tax.
-            $currentTotal = $lineItem->getSubtotal() + $lineItem->getAdjustmentsTotal();
-            $discountAmount = -($currentTotal * ($discountPercent / 100));
+            if ($discountPercent >= 100) {
+                // For a full 100% gift, neutralize the line's tax adjustments so the
+                // line records zero VAT — otherwise Commerce keeps tax collected on a
+                // free item, producing incorrect tax-detail rows on invoices.
+                foreach ($lineItem->getAdjustments() as $existing) {
+                    if ($existing->type !== 'tax' || (float)$existing->amount === 0.0) {
+                        continue;
+                    }
+
+                    $counter = new OrderAdjustment();
+                    $counter->type = 'tax';
+                    $counter->name = 'Gift Tax Exemption';
+                    $counter->description = $rule->name;
+                    $counter->setLineItem($lineItem);
+                    $counter->setOrder($order);
+                    $counter->amount = -$existing->amount;
+                    $counter->included = (bool)$existing->included;
+                    $counter->sourceSnapshot = array_merge(
+                        $existing->getSourceSnapshot() ?: [],
+                        [
+                            'giftRuleId' => $rule->id,
+                            'giftTaxExemption' => true,
+                        ]
+                    );
+
+                    $adjustments[] = $counter;
+                }
+
+                // Size the discount so subtotal + total discount = 0, which makes
+                // both the line total and the line's taxable subtotal land on 0.
+                $discountAmount = -($lineItem->getSubtotal() + $lineItem->getDiscount());
+            } else {
+                // Partial gift: keep the percentage-of-current-total behavior so tax
+                // still applies on the portion the customer actually pays.
+                $currentTotal = $lineItem->getSubtotal() + $lineItem->getAdjustmentsTotal();
+                $discountAmount = -($currentTotal * ($discountPercent / 100));
+            }
 
             $adjustment = new OrderAdjustment();
             $adjustment->type = self::ADJUSTMENT_TYPE;
